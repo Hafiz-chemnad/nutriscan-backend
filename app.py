@@ -1,13 +1,21 @@
 from flask import Flask, request, jsonify
 import json
 from datetime import datetime
+from dotenv import load_dotenv
+import os
+ # loads variables from .env
 
 # Import database and Gemini functions
 from database import get_product_by_barcode, save_user_preferences, get_user_profile, save_product_analysis
 from gemini_api import analyze_with_gemini, compare_products_with_gemini
 
+load_dotenv() 
 app = Flask(__name__)
 
+@app.route('/')
+def home():
+    return jsonify({"message": "NutriScan backend is running!"})
+    
 def analyze_ingredients(ingredients, user_id):
     user_prefs = get_user_profile(user_id)
     allergens_found=[]
@@ -94,7 +102,5 @@ def compare_products():
     except Exception as e:
         return jsonify({'error':'Failed to perform product comparison','message':str(e)}),500
 
-if __name__ == '__main__':
-    import os
-    port = int(os.environ.get('PORT', 5000))  # gets PORT from env, defaults to 5000
-    app.run(host='0.0.0.0', port=port, debug=True)
+if __name__=='__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
